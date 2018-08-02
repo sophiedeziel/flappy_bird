@@ -7,12 +7,20 @@
 
 #define JUMP_PIN 2
 
-Adafruit_SSD1306 display(-1);
+#if (SSD1306_LCDHEIGHT != 64)
+#error("Height incorrect, please fix Adafruit_SSD1306.h!");
+#endif
 
-float posY = 15;
+Adafruit_SSD1306 display(4);
+
+
+const float gravity = 0.02;
+const float jump_height = 0.6;
+
+const float initialY = 32;
+
+float posY = initialY;
 float velocity = 0;
-const float gravity = 0.01;
-const float jump_height = 0.4;
 
 const int debounceTime = 200;
 
@@ -53,30 +61,32 @@ void gameNextFrame() {
   velocity += gravity;
   posY += velocity;
 
-  display.drawRect(20, posY, 4, 4, WHITE);
+  display.drawFastHLine(0, 15, 128, WHITE);
+  display.drawRect(20, posY, 6, 6, WHITE);
 
-  if (posY < 0 || posY > 28) {
+  if (posY < 16 || posY > 58) {
     gameMode = 2;
     resetBird();
   }
 }
 
 void startFrame() {
+  
   display.setTextSize(2);
   display.setTextColor(WHITE);
-  display.setCursor(10, 10);
+  display.setCursor(20, 25);
   display.println("START!");
 }
 
 void deadFrame() {
   display.setTextSize(2);
   display.setTextColor(WHITE);
-  display.setCursor(10, 10);
+  display.setCursor(20, 25);
   display.println("DEAD!");
 }
 
 void resetBird() {
-  posY = 15;
+  posY = initialY;
   velocity = 0;
 }
 

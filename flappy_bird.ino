@@ -27,10 +27,10 @@ void setup() {
 }
 
 void loop() {
-  doSomething();
+  gameNextFrame();
 }
 
-void doSomething() {
+void gameNextFrame() {
   velocity += gravity;
   posY += velocity;
 

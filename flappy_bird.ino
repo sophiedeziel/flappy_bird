@@ -2,7 +2,6 @@
 #include <Wire.h>
 #include <Adafruit_GFX.h>
 #include <Adafruit_SSD1306.h>
-#include <Wire.h>
 
 #define JUMP_PIN 2
 
@@ -65,7 +64,6 @@ void gameNextFrame() {
 }
 
 void startFrame() {
-  
   display.setTextSize(2);
   display.setTextColor(WHITE);
   display.setCursor(20, 25);

@@ -1,4 +1,3 @@
-
 #include <SPI.h>
 #include <Wire.h>
 #include <Adafruit_GFX.h>
@@ -13,18 +12,14 @@
 
 Adafruit_SSD1306 display(4);
 
-
-const float gravity = 0.02;
+const float gravity     = 0.02;
 const float jump_height = 0.6;
+const float initialY    = 32;
+const int debounceTime  = 200;
 
-const float initialY = 32;
-
-float posY = initialY;
+long last_jump;
+float posY     = initialY;
 float velocity = 0;
-
-const int debounceTime = 200;
-
-static long last_jump;
 
 // game modes:
 // 0: start
@@ -35,7 +30,6 @@ int gameMode = 0;
 void setup() {
   Wire.begin();
   display.begin(SSD1306_SWITCHCAPVCC, 0x3C);
-
   Serial.begin(115200);
   attachInterrupt(digitalPinToInterrupt(JUMP_PIN), jump, FALLING);
 }

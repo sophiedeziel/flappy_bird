@@ -12,8 +12,8 @@
 
 Adafruit_SSD1306 display(4);
 
-const float gravity     = 0.02;
-const float jump_height = 0.6;
+const float gravity     = 0.03;
+const float jump_height = 0.8;
 const float initialY    = 32;
 const int debounceTime  = 200;
 

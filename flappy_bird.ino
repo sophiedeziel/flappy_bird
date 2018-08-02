@@ -37,19 +37,14 @@ void loop() {
 
   switch (gameMode) {
     case 0:
-      display.setTextSize(1);
-      display.setTextColor(WHITE);
-      display.setCursor(10, 10);
-      display.println("START!");
+      startFrame();
       break;
     case 1:
       gameNextFrame();
       break;
     case 2:
-      display.setTextSize(1);
-      display.setTextColor(WHITE);
-      display.setCursor(10, 10);
-      display.println("DEAD!");
+      deadFrame();
+      break;
   }
   display.display();
 }
@@ -64,6 +59,20 @@ void gameNextFrame() {
     gameMode = 2;
     resetBird();
   }
+}
+
+void startFrame() {
+  display.setTextSize(2);
+  display.setTextColor(WHITE);
+  display.setCursor(10, 10);
+  display.println("START!");
+}
+
+void deadFrame() {
+  display.setTextSize(2);
+  display.setTextColor(WHITE);
+  display.setCursor(10, 10);
+  display.println("DEAD!");
 }
 
 void resetBird() {

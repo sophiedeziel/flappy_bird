@@ -21,6 +21,7 @@ static long last_jump;
 // game modes:
 // 0: start
 // 1: jeu
+// 2: dead
 int gameMode = 0;
 
 void setup() {
@@ -32,23 +33,35 @@ void setup() {
 }
 
 void loop() {
-  if (gameMode == 0) {
+  display.clearDisplay();
 
-  } else {
-    gameNextFrame();
+  switch (gameMode) {
+    case 0:
+      display.setTextSize(1);
+      display.setTextColor(WHITE);
+      display.setCursor(10, 10);
+      display.println("START!");
+      break;
+    case 1:
+      gameNextFrame();
+      break;
+    case 2:
+      display.setTextSize(1);
+      display.setTextColor(WHITE);
+      display.setCursor(10, 10);
+      display.println("DEAD!");
   }
+  display.display();
 }
 
 void gameNextFrame() {
   velocity += gravity;
   posY += velocity;
 
-  display.clearDisplay();
   display.drawRect(20, posY, 4, 4, WHITE);
-  display.display();
 
   if (posY < 0 || posY > 28) {
-    gameMode = 0;
+    gameMode = 2;
     resetBird();
   }
 }

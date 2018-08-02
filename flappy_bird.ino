@@ -78,7 +78,6 @@ void jump() {
   if (millis() - last_jump > debounceTime) {
     last_jump = millis();
     bird.jump();
-    Serial.println("Jump!");
   }
 }
 

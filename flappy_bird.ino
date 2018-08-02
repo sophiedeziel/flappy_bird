@@ -2,6 +2,7 @@
 #include <Wire.h>
 #include <Adafruit_GFX.h>
 #include <Adafruit_SSD1306.h>
+#include "bird.h"
 
 #define JUMP_PIN 2
 
@@ -11,20 +12,16 @@
 
 Adafruit_SSD1306 display(4);
 
-const float gravity     = 0.03;
-const float jump_height = 0.8;
-const float initialY    = 32;
 const int debounceTime  = 200;
-
 long last_jump;
-float posY     = initialY;
-float velocity = 0;
 
 // game modes:
 // 0: start
 // 1: jeu
 // 2: dead
 int gameMode = 0;
+
+Bird bird;
 
 void setup() {
   Wire.begin();
@@ -51,43 +48,38 @@ void loop() {
 }
 
 void gameNextFrame() {
-  velocity += gravity;
-  posY += velocity;
-
+  bird.nextFrame();
   display.drawFastHLine(0, 15, 128, WHITE);
-  display.drawRect(20, posY, 6, 6, WHITE);
+  display.drawRect(20, bird.posY, 6, 6, WHITE);
 
-  if (posY < 16 || posY > 58) {
+  if (bird.posY < 16 || bird.posY > 58) {
     gameMode = 2;
-    resetBird();
+    bird.reinitialize();
   }
 }
 
 void startFrame() {
-  display.setTextSize(2);
-  display.setTextColor(WHITE);
-  display.setCursor(20, 25);
-  display.println("START!");
+  titleFrame("START!");
 }
 
 void deadFrame() {
+  titleFrame("DEAD!");
+}
+
+void titleFrame(String text) {
   display.setTextSize(2);
   display.setTextColor(WHITE);
   display.setCursor(20, 25);
-  display.println("DEAD!");
-}
-
-void resetBird() {
-  posY = initialY;
-  velocity = 0;
+  display.println(text);
 }
 
 void jump() {
   gameMode = 1;
   if (millis() - last_jump > debounceTime) {
     last_jump = millis();
-    velocity = -jump_height;
+    bird.jump();
     Serial.println("Jump!");
   }
 }
+
 

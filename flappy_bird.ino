@@ -3,12 +3,16 @@
 #include <Adafruit_GFX.h>
 #include <Adafruit_SSD1306.h>
 #include "bird.h"
+#include "pipe.h"
 
 #define JUMP_PIN 2
 
 #if (SSD1306_LCDHEIGHT != 64)
 #error("Height incorrect, please fix Adafruit_SSD1306.h!");
 #endif
+
+Bird bird;
+Pipe pipe;
 
 Adafruit_SSD1306 display(4);
 
@@ -21,7 +25,6 @@ long last_jump;
 // 2: dead
 int gameMode = 0;
 
-Bird bird;
 
 void setup() {
   Wire.begin();
@@ -49,12 +52,16 @@ void loop() {
 
 void gameNextFrame() {
   bird.nextFrame();
-  display.drawFastHLine(0, 15, 128, WHITE);
+  pipe.nextFrame();
+
+  display.drawRect(pipe.posX, 16, 4, pipe.height, WHITE);
+  display.drawRect(pipe.posX, pipe.height + 32, 4, 64, WHITE);
+
+  display.drawRect(0, 16, 128, 48, WHITE);
   display.drawRect(20, bird.posY, 6, 6, WHITE);
 
-  if (bird.posY < 16 || bird.posY > 58) {
-    gameMode = 2;
-    bird.reinitialize();
+  if (bird.posY < 17 || bird.posY > 58) {
+    gameOver();
   }
 }
 
@@ -71,6 +78,11 @@ void titleFrame(String text) {
   display.setTextColor(WHITE);
   display.setCursor(20, 25);
   display.println(text);
+}
+
+void gameOver() {
+  gameMode = 2;
+  bird.reinitialize();
 }
 
 void jump() {

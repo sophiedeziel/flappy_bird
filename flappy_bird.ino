@@ -17,6 +17,8 @@ Adafruit_SSD1306 display(4);
 const int debounceTime  = 200;
 long last_jump;
 
+int score = 0;
+
 Bird bird;
 Pipe pipes[NUM_PIPES] = {
   Pipe(128 + random(5)),
@@ -46,9 +48,11 @@ void loop() {
       startFrame();
       break;
     case 1:
+      showScore();
       gameNextFrame();
       break;
     case 2:
+      showScore();
       deadFrame();
       break;
   }
@@ -57,6 +61,7 @@ void loop() {
 
 void gameNextFrame() {
   display.drawRect(0, 16, 128, 48, WHITE);
+
   birdMove();
 
   for (int i = 0; i < NUM_PIPES; i++) {
@@ -64,7 +69,7 @@ void gameNextFrame() {
 
     if (pipes[i].posX == 20) {
       if (bird.posY > 16 + pipes[i].height && bird.posY < 32 + pipes[i].height) {
-        Serial.println("Point!!!");
+        score++;
       } else {
         gameOver();
       }
@@ -108,6 +113,13 @@ void titleFrame(String text) {
   display.println(text);
 }
 
+void showScore() {
+  display.setTextSize(1.5);
+  display.setTextColor(WHITE);
+  display.setCursor(0, 0);
+  display.println(score);
+}
+
 void gameOver() {
   gameMode = 2;
   bird.reinitialize();
@@ -119,9 +131,20 @@ void gameOver() {
 }
 
 void jump() {
-  gameMode = 1;
   if (millis() - last_jump > debounceTime) {
     last_jump = millis();
-    bird.jump();
+
+    switch (gameMode) {
+      case 0:
+        gameMode = 1;
+        break;
+      case 1:
+        bird.jump();
+        break;
+      case 2:
+        gameMode = 1;
+        score = 0;
+        break;
+    }
   }
 }

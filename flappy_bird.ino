@@ -56,10 +56,19 @@ void loop() {
 }
 
 void gameNextFrame() {
+  display.drawRect(0, 16, 128, 48, WHITE);
   birdMove();
 
   for (int i = 0; i < NUM_PIPES; i++) {
     pipeMove(pipes[i]);
+
+    if (pipes[i].posX == 20) {
+      if (bird.posY > 16 + pipes[i].height && bird.posY < 32 + pipes[i].height) {
+        Serial.println("Point!!!");
+      } else {
+        gameOver();
+      }
+    }
   }
 }
 
@@ -70,7 +79,6 @@ void birdMove() {
     gameOver();
   }
 
-  display.drawRect(0, 16, 128, 48, WHITE);
   display.drawRect(20, bird.posY, 6, 6, WHITE);
 }
 

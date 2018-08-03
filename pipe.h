@@ -2,9 +2,10 @@ class Pipe
 {
   public:
     int height;
-    float posX = 128;
+    float posX;
 
-    Pipe() {
+    Pipe(int initialX) {
+      posX = initialX;
       setHeight();
     }
 
@@ -12,13 +13,13 @@ class Pipe
       posX += -0.5;
     }
 
-    void reinitialize() {
+    void reinitialize(float newPosition) {
       setHeight();
-      posX = 128;
+      posX = newPosition;
     }
   private:
 
   void setHeight(){
-    height = random(48) + 15;
+    height = random(35);
   }
 };

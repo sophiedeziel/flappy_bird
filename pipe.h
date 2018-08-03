@@ -17,9 +17,10 @@ class Pipe
       setHeight();
       posX = newPosition;
     }
+
   private:
 
-  void setHeight(){
-    height = random(35);
-  }
+    void setHeight() {
+      height = random(35);
+    }
 };

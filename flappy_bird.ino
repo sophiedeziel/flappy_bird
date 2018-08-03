@@ -20,9 +20,9 @@ long last_jump;
 Bird bird;
 Pipe pipes[NUM_PIPES] = {
   Pipe(128 + random(5)),
-  Pipe(158+ random(5)),
-  Pipe(188+ random(5)),
-  Pipe(218+ random(5))
+  Pipe(158 + random(5)),
+  Pipe(188 + random(5)),
+  Pipe(218 + random(5))
 };
 
 // game modes:
@@ -30,7 +30,6 @@ Pipe pipes[NUM_PIPES] = {
 // 1: jeu
 // 2: dead
 int gameMode = 0;
-
 
 void setup() {
   Wire.begin();
@@ -84,7 +83,6 @@ void pipeMove(Pipe &pipe) {
   if (pipe.posX < -4) {
     pipe.reinitialize(128);
   }
-
 }
 
 void startFrame() {
@@ -119,5 +117,3 @@ void jump() {
     bird.jump();
   }
 }
-
-

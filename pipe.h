@@ -5,10 +5,20 @@ class Pipe
     float posX = 128;
 
     Pipe() {
-      height = random(48) + 15;
+      setHeight();
     }
 
     void nextFrame() {
-      posX -= 0.5;
+      posX += -0.5;
     }
+
+    void reinitialize() {
+      setHeight();
+      posX = 128;
+    }
+  private:
+
+  void setHeight(){
+    height = random(48) + 15;
+  }
 };

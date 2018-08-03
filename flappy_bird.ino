@@ -6,18 +6,19 @@
 #include "pipe.h"
 
 #define JUMP_PIN 2
+#define NUM_PIPES 1
 
 #if (SSD1306_LCDHEIGHT != 64)
 #error("Height incorrect, please fix Adafruit_SSD1306.h!");
 #endif
 
-Bird bird;
-Pipe pipe;
-
 Adafruit_SSD1306 display(4);
 
 const int debounceTime  = 200;
 long last_jump;
+
+Bird bird;
+Pipe* pipes = new Pipe[NUM_PIPES];
 
 // game modes:
 // 0: start
@@ -51,18 +52,30 @@ void loop() {
 }
 
 void gameNextFrame() {
-  bird.nextFrame();
-  pipe.nextFrame();
+  birdMove();
+ 
+  for(int i = 0; i < NUM_PIPES; i++){
+    pipeMove(pipes[i]);
+  }
 
-  display.drawRect(pipe.posX, 16, 4, pipe.height, WHITE);
-  display.drawRect(pipe.posX, pipe.height + 32, 4, 64, WHITE);
-
-  display.drawRect(0, 16, 128, 48, WHITE);
-  display.drawRect(20, bird.posY, 6, 6, WHITE);
 
   if (bird.posY < 17 || bird.posY > 58) {
     gameOver();
   }
+}
+
+void birdMove() {
+  bird.nextFrame();
+  display.drawRect(0, 16, 128, 48, WHITE);
+  display.drawRect(20, bird.posY, 6, 6, WHITE);
+}
+
+void pipeMove(Pipe &pipe) {
+  pipe.nextFrame();
+  Serial.println(pipe.posX);
+
+  display.drawRect(pipe.posX, 16, 4, pipe.height, WHITE);
+  display.drawRect(pipe.posX, pipe.height + 32, 4, 64, WHITE);
 }
 
 void startFrame() {
@@ -83,6 +96,9 @@ void titleFrame(String text) {
 void gameOver() {
   gameMode = 2;
   bird.reinitialize();
+  for(int i = 0; i < NUM_PIPES; i++){
+    pipes[i].reinitialize();
+  }
 }
 
 void jump() {

@@ -1,5 +1,3 @@
-#include <SPI.h>
-#include <Wire.h>
 #include <Adafruit_GFX.h>
 #include <Adafruit_SSD1306.h>
 #include "bird.h"
@@ -34,7 +32,6 @@ Pipe pipes[NUM_PIPES] = {
 int gameMode = 0;
 
 void setup() {
-  Wire.begin();
   display.begin(SSD1306_SWITCHCAPVCC, 0x3C);
   Serial.begin(115200);
   attachInterrupt(digitalPinToInterrupt(JUMP_PIN), jump, FALLING);

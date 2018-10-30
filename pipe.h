@@ -21,6 +21,6 @@ class Pipe
   private:
 
     void setHeight() {
-      height = random(35);
+      height = random(100);
     }
 };

@@ -2,8 +2,8 @@ class Bird
 {
   public:
     const float initialY    = 32;
-    const float jump_height = 0.8;
-    const float gravity     = 0.03;
+    const float jump_height = 2.0;
+    const float gravity     = 0.1;
 
     float posY;
     float velocity = 0;

@@ -25,7 +25,7 @@ Pipe pipes[NUM_PIPES] = {
   Pipe(218 + random(5))
 };
 
-// game modes:
+// game modes:665
 // 0: start
 // 1: jeu
 // 2: dead
@@ -34,12 +34,14 @@ int gameMode = 0;
 void setup() {
   display.begin(SSD1306_SWITCHCAPVCC, 0x3C);
   Serial.begin(115200);
+  pinMode(JUMP_PIN,  INPUT);
   attachInterrupt(digitalPinToInterrupt(JUMP_PIN), jump, FALLING);
+  display.setRotation(1);
 }
 
 void loop() {
   display.clearDisplay();
-
+  
   switch (gameMode) {
     case 0:
       startFrame();
@@ -57,7 +59,7 @@ void loop() {
 }
 
 void gameNextFrame() {
-  display.drawRect(0, 16, 128, 48, WHITE);
+  display.drawRect(0, 16, 64, 112, WHITE);
 
   birdMove();
 
@@ -77,7 +79,7 @@ void gameNextFrame() {
 void birdMove() {
   bird.nextFrame();
 
-  if (bird.posY < 17 || bird.posY > 58) {
+  if (bird.posY < 17 || bird.posY > 122) {
     gameOver();
   }
 

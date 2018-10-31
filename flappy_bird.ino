@@ -18,10 +18,11 @@ long last_jump;
 
 int score = 0;
 
-int gameWidth = 64;
-int gameHeight = 112;
 int gameXOffset = 0;
 int gameYOffset = 16;
+int gameWidth = SSD1306_LCDHEIGHT;
+int gameHeight = SSD1306_LCDWIDTH - gameYOffset;
+
 
 Bird bird;
 
@@ -112,7 +113,7 @@ void deadFrame() {
 void titleFrame(String text) {
   display.setTextSize(2);
   display.setTextColor(WHITE);
-  display.setCursor(0, 50);
+  display.setCursor(0, gameHeight / 2 );
   display.println(text);
 }
 

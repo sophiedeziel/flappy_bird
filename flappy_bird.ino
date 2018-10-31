@@ -1,10 +1,11 @@
 #include <Adafruit_GFX.h>
 #include <Adafruit_SSD1306.h>
+
 #include "bird.h"
 #include "pipe.h"
 
 #define JUMP_PIN 2
-#define NUM_PIPES 4
+#define NUM_PIPES 3
 
 #if (SSD1306_LCDHEIGHT != 64)
 #error("Height incorrect, please fix Adafruit_SSD1306.h!");
@@ -17,15 +18,20 @@ long last_jump;
 
 int score = 0;
 
+int gameWidth = 64;
+int gameHeight = 112;
+int gameXOffset = 0;
+int gameYOffset = 16;
+
 Bird bird;
+
 Pipe pipes[NUM_PIPES] = {
-  Pipe(128 + random(5)),
-  Pipe(158 + random(5)),
-  Pipe(188 + random(5)),
-  Pipe(218 + random(5))
+  Pipe(0),
+  Pipe(0),
+  Pipe(0)
 };
 
-// game modes:665
+// game modes:
 // 0: start
 // 1: jeu
 // 2: dead
@@ -37,11 +43,12 @@ void setup() {
   pinMode(JUMP_PIN,  INPUT);
   attachInterrupt(digitalPinToInterrupt(JUMP_PIN), jump, FALLING);
   display.setRotation(1);
+  initPipes();
 }
 
 void loop() {
   display.clearDisplay();
-  
+
   switch (gameMode) {
     case 0:
       startFrame();
@@ -59,15 +66,18 @@ void loop() {
 }
 
 void gameNextFrame() {
-  display.drawRect(0, 16, 64, 112, WHITE);
+  display.drawRect(gameXOffset, gameYOffset, gameWidth, gameHeight, WHITE);
 
   birdMove();
+  checkCollisions();
+}
 
+void checkCollisions() {
   for (int i = 0; i < NUM_PIPES; i++) {
     pipeMove(pipes[i]);
 
-    if (pipes[i].posX == 20) {
-      if (bird.posY > 16 + pipes[i].height && bird.posY < 32 + pipes[i].height) {
+    if (pipes[i].posX == bird.posX) {
+      if (bird.posY > gameYOffset + pipes[i].height && bird.posY < pipes[i].holeSize + pipes[i].height) {
         score++;
       } else {
         gameOver();
@@ -79,26 +89,20 @@ void gameNextFrame() {
 void birdMove() {
   bird.nextFrame();
 
-  if (bird.posY < 17 || bird.posY > 122) {
+  if (bird.posY < gameYOffset || bird.posY > gameHeight + gameYOffset) {
     gameOver();
   }
 
-  display.drawRect(20, bird.posY, 6, 6, WHITE);
+  bird.draw();
 }
 
 void pipeMove(Pipe &pipe) {
   pipe.nextFrame();
-
-  display.drawRect(pipe.posX, 16, 4, pipe.height, WHITE);
-  display.drawRect(pipe.posX, pipe.height + 32, 4, 64, WHITE);
-
-  if (pipe.posX < -4) {
-    pipe.reinitialize(128);
-  }
+  pipe.draw();
 }
 
 void startFrame() {
-  titleFrame("START!");
+  titleFrame("START");
 }
 
 void deadFrame() {
@@ -108,7 +112,7 @@ void deadFrame() {
 void titleFrame(String text) {
   display.setTextSize(2);
   display.setTextColor(WHITE);
-  display.setCursor(0, 25);
+  display.setCursor(0, 50);
   display.println(text);
 }
 
@@ -122,10 +126,14 @@ void showScore() {
 void gameOver() {
   gameMode = 2;
   bird.reinitialize();
-  float pipePosition = 128;
+  initPipes();
+}
+
+void initPipes() {
+  float nextPipePosition = gameWidth;
   for (int i = 0; i < NUM_PIPES; i++) {
-    pipes[i].reinitialize(pipePosition);
-    pipePosition += 30;
+    pipes[i].reinitialize(nextPipePosition + random(5));
+    nextPipePosition += pipes[i].pipeSpace;
   }
 }
 

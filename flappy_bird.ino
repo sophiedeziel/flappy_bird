@@ -10,7 +10,10 @@
 Adafruit_SSD1306 display(128, 64, &Wire ,4);
 
 const int debounceTime  = 200;
+const int voltSampleTime = 5000;
 long last_jump;
+long last_volt = -1;
+float batteryVolts = 0;
 
 int score = 0;
 
@@ -48,13 +51,16 @@ void loop() {
 
   switch (gameMode) {
     case 0:
+      showBattery();
       startFrame();
       break;
     case 1:
+      showBattery();
       showScore();
       gameNextFrame();
       break;
     case 2:
+      showBattery();
       showScore();
       deadFrame();
       break;
@@ -116,11 +122,43 @@ void titleFrame(String text) {
   display.println(text);
 }
 
+void showBattery() {
+  display.setTextSize(1.5);
+  display.setTextColor(WHITE);
+  display.setCursor(40, 0);
+  int percent = map(readVcc(), 3200, 4000, 0, 100);
+  display.println(percent);
+}
+
 void showScore() {
   display.setTextSize(1.5);
   display.setTextColor(WHITE);
   display.setCursor(0, 0);
   display.println(score);
+}
+
+float readVcc() {
+  if (millis() - last_volt > voltSampleTime) {
+    last_volt = millis();
+    // Read 1.1V reference against AVcc
+    // set the reference to Vcc and the measurement to the internal 1.1V reference
+
+    ADMUX = _BV(REFS0) | _BV(MUX3) | _BV(MUX2) | _BV(MUX1);
+
+    delay(10); // Wait for Vref to settle
+    ADCSRA |= _BV(ADSC); // Start conversion
+    while (bit_is_set(ADCSRA, ADSC)); // measuring
+
+    uint8_t low  = ADCL; // must read ADCL first - it then locks ADCH
+    uint8_t high = ADCH; // unlocks both
+
+    float result = (high << 8) | low;
+
+    result = 1.1 * 1023.0 * 1000.0 / result; // Calculate Vcc (in mV); 1125300 = 1.1*1023*1000
+    batteryVolts = result;
+  }
+
+  return batteryVolts; // Vcc in millivolts
 }
 
 void gameOver() {

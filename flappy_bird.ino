@@ -20,12 +20,12 @@ int gameWidth   = 64;
 int gameHeight  = 128 - gameYOffset;
 
 
-Bird bird;
+Bird bird(&display);
 
 Pipe pipes[NUM_PIPES] = {
-  Pipe(0),
-  Pipe(0),
-  Pipe(0)
+  Pipe(0, &display),
+  Pipe(0, &display),
+  Pipe(0, &display)
 };
 
 // game modes:

@@ -7,11 +7,7 @@
 #define JUMP_PIN 2
 #define NUM_PIPES 3
 
-#if (SSD1306_LCDHEIGHT != 64)
-#error("Height incorrect, please fix Adafruit_SSD1306.h!");
-#endif
-
-Adafruit_SSD1306 display(4);
+Adafruit_SSD1306 display(128, 64, &Wire ,4);
 
 const int debounceTime  = 200;
 long last_jump;
@@ -20,8 +16,8 @@ int score = 0;
 
 int gameXOffset = 0;
 int gameYOffset = 16;
-int gameWidth = SSD1306_LCDHEIGHT;
-int gameHeight = SSD1306_LCDWIDTH - gameYOffset;
+int gameWidth   = 64;
+int gameHeight  = 128 - gameYOffset;
 
 
 Bird bird;

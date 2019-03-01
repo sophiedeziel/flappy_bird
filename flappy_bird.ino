@@ -73,12 +73,15 @@ void checkCollisions() {
   for (int i = 0; i < NUM_PIPES; i++) {
     pipeMove(pipes[i]);
 
-    if (pipes[i].posX == bird.posX) {
+    if (pipes[i].posX <= bird.posX && (pipes[i].posX + 6) >= bird.posX) {
       if (bird.posY > gameYOffset + pipes[i].height && bird.posY < pipes[i].holeSize + pipes[i].height) {
-        score++;
+        
       } else {
         gameOver();
       }
+    }
+    if ((pipes[i].posX + 6) == bird.posX) {
+      score++;
     }
   }
 }

@@ -2,7 +2,7 @@ class Pipe
 {
   public:
     int height;
-    int holeSize = 32;
+    int holeSize = 36;
     float posX;
 
     const int pipeSpace = 30;

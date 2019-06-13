@@ -196,7 +196,7 @@ void gameOver() {
 void initPipes() {
   float nextPipePosition = gameWidth;
   for (int i = 0; i < NUM_PIPES; i++) {
-    pipes[i].reinitialize(nextPipePosition + random(5));
+    pipes[i].reinitialize(nextPipePosition + random(10));
     nextPipePosition += pipes[i].pipeSpace;
   }
 }

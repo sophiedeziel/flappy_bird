@@ -9,13 +9,14 @@
 #define NUM_PIPES 3
 #define BEST_SCORE_AT_ADDR 0
 
-Adafruit_SSD1306 display(128, 64, &Wire ,4);
+Adafruit_SSD1306 display(128, 64, &Wire , 4);
 
 const int debounceTime  = 200;
-const int voltSampleTime = 5000;
+const int voltSampleTime = 300;
 long last_jump;
-long last_volt = -1;
-float batteryVolts = 0;
+long last_volt = millis();
+int batteryFrame = 0;
+
 
 uint8_t score = 0;
 
@@ -89,7 +90,7 @@ void checkCollisions() {
 
     if (pipes[i].posX <= bird.posX && (pipes[i].posX + 6) >= bird.posX) {
       if (bird.posY > gameYOffset + pipes[i].height && bird.posY < pipes[i].holeSize + pipes[i].height) {
-        
+
       } else {
         gameOver();
       }
@@ -139,11 +140,24 @@ void titleFrame(String text) {
 }
 
 void showBattery() {
+  int volts = readVcc();
   display.setTextSize(1.5);
   display.setTextColor(WHITE);
   display.setCursor(40, 0);
-  int percent = map(readVcc(), 3200, 4000, 0, 100);
-  display.println(percent);
+  display.drawRect(50, 0, 14, 8, WHITE);
+  display.drawRect(48, 2, 2, 4, WHITE);
+
+  if (volts > 4500) {
+    batteryFrame++;
+    if (batteryFrame > 14) {
+      batteryFrame = 0;
+    }
+
+    display.fillRect(50, 0, batteryFrame, 8, WHITE);
+  } else {
+    int level = map(volts, 3600, 4000, 0, 14);
+    display.fillRect(50, 0, level, 8, WHITE);
+  }
 }
 
 void showScore() {
@@ -154,27 +168,23 @@ void showScore() {
 }
 
 float readVcc() {
-  if (millis() - last_volt > voltSampleTime) {
-    last_volt = millis();
-    // Read 1.1V reference against AVcc
-    // set the reference to Vcc and the measurement to the internal 1.1V reference
+  // Read 1.1V reference against AVcc
+  // set the reference to Vcc and the measurement to the internal 1.1V reference
 
-    ADMUX = _BV(REFS0) | _BV(MUX3) | _BV(MUX2) | _BV(MUX1);
+  ADMUX = _BV(REFS0) | _BV(MUX3) | _BV(MUX2) | _BV(MUX1);
 
-    delay(10); // Wait for Vref to settle
-    ADCSRA |= _BV(ADSC); // Start conversion
-    while (bit_is_set(ADCSRA, ADSC)); // measuring
+  delay(2); // Wait for Vref to settle
+  ADCSRA |= _BV(ADSC); // Start conversion
+  while (bit_is_set(ADCSRA, ADSC)); // measuring
 
-    uint8_t low  = ADCL; // must read ADCL first - it then locks ADCH
-    uint8_t high = ADCH; // unlocks both
+  uint8_t low  = ADCL; // must read ADCL first - it then locks ADCH
+  uint8_t high = ADCH; // unlocks both
 
-    float result = (high << 8) | low;
+  float result = (high << 8) | low;
 
-    result = 1.1 * 1023.0 * 1000.0 / result; // Calculate Vcc (in mV); 1125300 = 1.1*1023*1000
-    batteryVolts = result;
-  }
+  result = 1.1 * 1023.0 * 1000.0 / result; // Calculate Vcc (in mV); 1125300 = 1.1*1023*1000
 
-  return batteryVolts; // Vcc in millivolts
+  return result;
 }
 
 void gameOver() {
@@ -187,7 +197,7 @@ void gameOver() {
   }
 
   if (bestScoreToday < score) {
-    bestScoreAT = score;
+    bestScoreToday = score;
   }
 
   EEPROM.put(BEST_SCORE_AT_ADDR, bestScoreAT);

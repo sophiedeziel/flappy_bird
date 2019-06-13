@@ -1,11 +1,13 @@
 #include <Adafruit_GFX.h>
 #include <Adafruit_SSD1306.h>
+#include <EEPROM.h>
 
 #include "bird.h"
 #include "pipe.h"
 
 #define JUMP_PIN 2
 #define NUM_PIPES 3
+#define BEST_SCORE_AT_ADDR 0
 
 Adafruit_SSD1306 display(128, 64, &Wire ,4);
 
@@ -15,12 +17,15 @@ long last_jump;
 long last_volt = -1;
 float batteryVolts = 0;
 
-int score = 0;
+uint8_t score = 0;
 
 int gameXOffset = 0;
 int gameYOffset = 16;
 int gameWidth   = 64;
 int gameHeight  = 128 - gameYOffset;
+
+uint8_t bestScoreAT = 0;
+uint8_t bestScoreToday = 0;
 
 
 Bird bird(&display);
@@ -41,9 +46,12 @@ void setup() {
   display.begin(SSD1306_SWITCHCAPVCC, 0x3C);
   Serial.begin(115200);
   pinMode(JUMP_PIN,  INPUT);
-  attachInterrupt(digitalPinToInterrupt(JUMP_PIN), jump, FALLING);
+  attachInterrupt(digitalPinToInterrupt(JUMP_PIN), jump, RISING);
   display.setRotation(1);
   initPipes();
+
+  EEPROM.get(BEST_SCORE_AT_ADDR, bestScoreAT);
+  Serial.println(bestScoreAT);
 }
 
 void loop() {
@@ -113,6 +121,14 @@ void startFrame() {
 
 void deadFrame() {
   titleFrame("Game over!");
+  display.setTextSize(1);
+  display.setTextColor(WHITE);
+  display.setCursor(0, 95);
+  display.print("Best:  ");
+  display.println(bestScoreAT);
+  display.setCursor(0, 110);
+  display.print("Today: ");
+  display.println(bestScoreToday);
 }
 
 void titleFrame(String text) {
@@ -165,6 +181,16 @@ void gameOver() {
   gameMode = 2;
   bird.reinitialize();
   initPipes();
+
+  if (bestScoreAT < score) {
+    bestScoreAT = score;
+  }
+
+  if (bestScoreToday < score) {
+    bestScoreAT = score;
+  }
+
+  EEPROM.put(BEST_SCORE_AT_ADDR, bestScoreAT);
 }
 
 void initPipes() {
